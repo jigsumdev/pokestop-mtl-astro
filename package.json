@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev --port 3000",
+    "dev:medusa": "cross-env PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000 PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_9a9678674b41f8e34ae3ced81452c137eb26a87d13d863eb55df937aa993ae18 astro dev --port 3000",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
@@ -17,5 +18,8 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "tailwindcss": "^3"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }

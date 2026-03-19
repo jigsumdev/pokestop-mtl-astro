@@ -11,9 +11,9 @@
 */
 
 export const MEDUSA_BACKEND_URL =
-  import.meta.env.PUBLIC_MEDUSA_BACKEND_URL ?? "";
+  import.meta.env.PUBLIC_MEDUSA_BACKEND_URL || "";
 export const MEDUSA_PUBLISHABLE_KEY =
-  import.meta.env.PUBLIC_MEDUSA_PUBLISHABLE_KEY ?? "";
+  import.meta.env.PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
 
 export interface MedusaProduct {
   id: string;
@@ -53,7 +53,19 @@ if (MEDUSA_PUBLISHABLE_KEY) {
   defaultHeaders["x-publishable-api-key"] = MEDUSA_PUBLISHABLE_KEY;
 }
 
-/** Fetch products from Medusa storefront API */
+let _cachedRegionId: string | null = null;
+
+async function getDefaultRegionId(): Promise<string | null> {
+  if (_cachedRegionId) return _cachedRegionId;
+  const regions = await fetchMedusaRegions();
+  if (regions?.regions?.length) {
+    _cachedRegionId = regions.regions[0].id;
+    return _cachedRegionId;
+  }
+  return null;
+}
+
+/** Fetch products from Medusa v2 storefront API */
 export async function fetchMedusaProducts(params?: {
   limit?: number;
   offset?: number;
@@ -63,16 +75,16 @@ export async function fetchMedusaProducts(params?: {
 }): Promise<MedusaProductsResponse | null> {
   if (!MEDUSA_BACKEND_URL) return null;
 
+  const regionId = params?.region_id || await getDefaultRegionId();
+
   const url = new URL(`${MEDUSA_BACKEND_URL}/store/products`);
   if (params?.limit) url.searchParams.set("limit", String(params.limit));
   if (params?.offset) url.searchParams.set("offset", String(params.offset));
-  if (params?.region_id) url.searchParams.set("region_id", params.region_id);
+  if (regionId) url.searchParams.set("region_id", regionId);
   if (params?.collection_id) {
     params.collection_id.forEach((id) => url.searchParams.append("collection_id[]", id));
   }
-  // Expand variants with pricing
-  url.searchParams.set("expand", "variants,variants.prices,images,collection,tags");
-  url.searchParams.set("fields", "id,title,description,thumbnail,handle,variants,images,tags,collection");
+  url.searchParams.set("fields", "*variants,*variants.calculated_price,*images,*tags,*collection");
 
   try {
     const res = await fetch(url.toString(), { headers: defaultHeaders });
@@ -93,7 +105,7 @@ export async function fetchMedusaProduct(handle: string): Promise<MedusaProduct 
 
   const url = new URL(`${MEDUSA_BACKEND_URL}/store/products`);
   url.searchParams.set("handle", handle);
-  url.searchParams.set("expand", "variants,variants.prices,images,collection,tags");
+  url.searchParams.set("fields", "*variants,*images,*tags,*collection");
 
   try {
     const res = await fetch(url.toString(), { headers: defaultHeaders });

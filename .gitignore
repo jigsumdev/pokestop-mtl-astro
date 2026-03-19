@@ -114,3 +114,7 @@ temp/
 # Manus logs
 .manus-logs/
 
+# Local Medusa backend (dev only)
+backend/
+backend-storefront/
+
