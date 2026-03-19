@@ -114,5 +114,3 @@ temp/
 # Manus logs
 .manus-logs/
 
-# Lock files (keep package.json canonical)
-package-lock.json
