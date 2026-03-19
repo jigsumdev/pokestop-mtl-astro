@@ -1,0 +1,76 @@
+---
+/*
+  ProductCard.astro — PokéStop MTL
+  Reusable product card with holo shimmer, badge, add-to-cart button
+*/
+interface Props {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  badge?: string;
+  grade?: string;
+  condition?: string;
+  rarity?: string;
+  stock?: number;
+  locale?: string;
+}
+
+const { id, name, price, image, badge, grade, condition, rarity, stock = 1, locale = "en" } = Astro.props;
+const priceStr = price === 0 ? "Contact" : `$${price.toFixed(2)}`;
+const stripeParts = [grade, condition, rarity].filter(Boolean);
+const disabled = stock === 0;
+---
+
+<div
+  class="group vault-card product-card holo-shimmer rounded-lg"
+  data-product-id={id}
+  data-product-name={name}
+  data-product-price={price}
+  data-product-image={image}
+  data-product-stock={stock}
+  role="button"
+  tabindex="0"
+  aria-label={`View ${name}`}
+>
+  <div class="img-wrap">
+    <img
+      src={image}
+      alt={name}
+      loading="lazy"
+      width="400"
+      height="533"
+      onerror="this.onerror=null;this.src='/product-placeholder.svg';"
+    />
+    <div class="overlay" aria-hidden="true"></div>
+    {stripeParts.length > 0 && (
+      <div class="card-info-stripe" aria-label={stripeParts.join(", ")}>
+        {stripeParts.join(" · ")}
+      </div>
+    )}
+    {badge && (
+      <span class={`badge ${badge}`} aria-label={badge}>
+        {badge.charAt(0).toUpperCase() + badge.slice(1)}
+      </span>
+    )}
+    <button
+      type="button"
+      class="add-cart"
+      data-product-id={id}
+      disabled={disabled}
+      aria-label={`Add ${name} to cart`}
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+    </button>
+  </div>
+  <div class="info">
+    <h3>{name}</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto">
+      <span class="price">{priceStr}</span>
+    </div>
+  </div>
+</div>

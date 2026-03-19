@@ -1,0 +1,46 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { useTranslations, faqItems } from "../../data/i18n";
+
+const locale = "fr";
+const t = useTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={t.faq.title}>
+  <div class="container" style="padding-top:6rem;padding-bottom:5rem;max-width:48rem">
+    <div style="text-align:center;margin-bottom:3rem">
+      <h1 style="font-family:var(--font-display);font-size:2.5rem;font-weight:800;margin:0 0 0.75rem">{t.faq.title}</h1>
+      <p style="color:var(--text-soft);font-size:1.125rem;margin:0">{t.faq.subtitle}</p>
+    </div>
+    <div id="faq-list">
+      {faqItems.map((item, i) => (
+        <div class="faq-item" data-index={i}>
+          <button type="button" class="faq-question" aria-expanded="false">
+            <span>{item.questionFr}</span>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="faq-answer">{item.answerFr}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('.faq-question').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item') as HTMLElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach((el) => {
+        el.classList.remove('open');
+        el.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>

@@ -1,0 +1,197 @@
+---
+/*
+  SiteHeader.astro — PokéStop MTL
+  Dark frosted-glass navbar with gold accent line, search, language switcher, cart badge
+*/
+import { useTranslations, localePath } from "../data/i18n";
+import type { SupportedLocale } from "../data/i18n";
+
+interface Props {
+  locale: SupportedLocale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const altLocale = locale === "en" ? "fr" : "en";
+
+const navLinks = [
+  { href: localePath(locale, "/"), label: t.nav.home, key: "home" },
+  { href: localePath(locale, "/shop/"), label: t.nav.shop, key: "shop" },
+  { href: localePath(locale, "/cards/"), label: t.nav.pokemon_cards, key: "cards" },
+  { href: localePath(locale, "/about/"), label: t.nav.about, key: "about" },
+  { href: localePath(locale, "/contact/"), label: t.nav.contact, key: "contact" },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <div class="container navbar-inner">
+    <!-- Logo -->
+    <a href={localePath(locale, "/")} class="logo" aria-label={t.site.name}>
+      <svg class="logo-img" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="2"/>
+        <path d="M1 18h34M18 1a17 17 0 0 1 0 34" stroke="currentColor" stroke-width="2"/>
+        <circle cx="18" cy="18" r="5" fill="currentColor"/>
+      </svg>
+      PokéStop <span class="accent">MTL</span>
+    </a>
+
+    <!-- Desktop nav links -->
+    <div class="nav-links" role="list">
+      {navLinks.map((link) => (
+        <a
+          href={link.href}
+          class={currentPath === link.href || currentPath.startsWith(link.href + "/") ? "active" : ""}
+          role="listitem"
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+
+    <!-- Actions -->
+    <div class="nav-actions">
+      <!-- Search toggle -->
+      <button type="button" class="search-toggle" aria-label={t.nav.search} aria-expanded="false" aria-controls="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+
+      <!-- Language switcher -->
+      <a href={altLocale === "fr" ? `/fr${currentPath.replace(/^\/fr/, "") || "/"}` : currentPath.replace(/^\/fr/, "") || "/"} class="lang-btn" aria-label={`Switch to ${altLocale === "fr" ? "Français" : "English"}`}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span class="lang-label">{altLocale.toUpperCase()}</span>
+      </a>
+
+      <!-- Cart -->
+      <a href={localePath(locale, "/cart/")} class="cart-link" aria-label={t.nav.cart}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="cart-badge" id="cart-badge" style="display:none" aria-live="polite">0</span>
+      </a>
+
+      <!-- Mobile menu toggle -->
+      <button type="button" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+        <span class="menu-icon-open" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </span>
+        <span class="menu-icon-close" style="display:none" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search bar -->
+  <div class="search-bar hidden" id="search-bar" role="search">
+    <div class="container">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="search"
+          id="search-input"
+          placeholder={t.nav.search}
+          aria-label={t.nav.search}
+          autocomplete="off"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="gold-line" aria-hidden="true"></div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <div class="backdrop" id="menu-backdrop" aria-hidden="true"></div>
+  <nav class="panel" aria-label="Mobile navigation">
+    {navLinks.map((link) => (
+      <a
+        href={link.href}
+        class={currentPath === link.href ? "active" : ""}
+      >
+        {link.label}
+      </a>
+    ))}
+    <a href={localePath(locale, "/faq/")}>{t.nav.faq}</a>
+    <a href={localePath(locale, "/cart/")}>{t.nav.cart}</a>
+  </nav>
+</div>
+
+<script>
+  // Navbar interactivity
+  const searchToggle = document.querySelector('.search-toggle') as HTMLButtonElement;
+  const searchBar = document.getElementById('search-bar') as HTMLElement;
+  const menuToggle = document.querySelector('.menu-toggle') as HTMLButtonElement;
+  const mobileMenu = document.getElementById('mobile-menu') as HTMLElement;
+  const menuBackdrop = document.getElementById('menu-backdrop') as HTMLElement;
+  const openIcon = document.querySelector('.menu-icon-open') as HTMLElement;
+  const closeIcon = document.querySelector('.menu-icon-close') as HTMLElement;
+
+  searchToggle?.addEventListener('click', () => {
+    const isHidden = searchBar.classList.toggle('hidden');
+    searchToggle.setAttribute('aria-expanded', String(!isHidden));
+    if (!isHidden) (document.getElementById('search-input') as HTMLInputElement)?.focus();
+  });
+
+  function openMenu() {
+    mobileMenu.classList.add('open');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+    menuToggle.setAttribute('aria-expanded', 'true');
+    if (openIcon) openIcon.style.display = 'none';
+    if (closeIcon) closeIcon.style.display = '';
+  }
+
+  function closeMenu() {
+    mobileMenu.classList.remove('open');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    if (openIcon) openIcon.style.display = '';
+    if (closeIcon) closeIcon.style.display = 'none';
+  }
+
+  menuToggle?.addEventListener('click', () => {
+    if (mobileMenu.classList.contains('open')) closeMenu();
+    else openMenu();
+  });
+
+  menuBackdrop?.addEventListener('click', closeMenu);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeMenu();
+      if (!searchBar.classList.contains('hidden')) {
+        searchBar.classList.add('hidden');
+        searchToggle?.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  // Cart badge from localStorage
+  function updateCartBadge() {
+    const cart = JSON.parse(localStorage.getItem('pokestop-cart') || '[]');
+    const badge = document.getElementById('cart-badge');
+    const n = cart.reduce((sum: number, x: {quantity?: number}) => sum + (x.quantity || 1), 0);
+    if (badge) {
+      badge.textContent = String(n);
+      badge.style.display = n > 0 ? 'flex' : 'none';
+    }
+  }
+
+  updateCartBadge();
+  window.addEventListener('storage', updateCartBadge);
+  window.addEventListener('cart-updated', updateCartBadge);
+</script>

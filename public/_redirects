@@ -1,0 +1,2 @@
+# Cloudflare Pages — SPA fallback (Astro static output handles routing)
+/fr/* /fr/:splat 200

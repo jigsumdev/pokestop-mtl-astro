@@ -1,0 +1,124 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { useTranslations } from "../data/i18n";
+
+const locale = "en";
+const t = useTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={t.cart.title}>
+  <div class="container" style="padding-top:6rem;padding-bottom:5rem" id="cart-root">
+    <!-- Empty state (shown by default, hidden by JS when cart has items) -->
+    <div class="cart-empty" id="cart-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+      <h1>{t.cart.title}</h1>
+      <p>{t.cart.empty}</p>
+      <a href="/shop/" class="btn-primary">{t.cart.continue}</a>
+    </div>
+
+    <!-- Cart with items (hidden by default, shown by JS) -->
+    <div id="cart-content" style="display:none">
+      <h1 style="font-family:var(--font-display);font-size:2.25rem;font-weight:800;margin:0 0 2rem">{t.cart.title}</h1>
+      <div class="cart-layout">
+        <div id="cart-items"></div>
+        <div class="vault-card cart-summary">
+          <h2>{t.order_summary}</h2>
+          <div class="summary-line">
+            <span id="summary-items-label">Items</span>
+            <span id="summary-subtotal">$0.00</span>
+          </div>
+          <div class="summary-line">
+            <span>Shipping</span>
+            <span id="summary-shipping">TBD</span>
+          </div>
+          <div class="summary-line total">
+            <span>Total</span>
+            <span id="summary-total">$0.00</span>
+          </div>
+          <button type="button" class="btn-primary checkout-btn" id="checkout-btn">{t.cart.checkout}</button>
+          <p class="free-ship">{t.cart.free_shipping}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { getCart, removeFromCart, updateQuantity, subtotal, totalItems } from "../scripts/cart";
+
+  const lang = document.documentElement.lang;
+
+  function renderCart() {
+    const cart = getCart();
+    const emptyEl = document.getElementById('cart-empty')!;
+    const contentEl = document.getElementById('cart-content')!;
+    const itemsEl = document.getElementById('cart-items')!;
+    const subtotalEl = document.getElementById('summary-subtotal')!;
+    const totalEl = document.getElementById('summary-total')!;
+    const itemsLabelEl = document.getElementById('summary-items-label')!;
+    const shippingEl = document.getElementById('summary-shipping')!;
+
+    if (cart.length === 0) {
+      emptyEl.style.display = '';
+      contentEl.style.display = 'none';
+      return;
+    }
+
+    emptyEl.style.display = 'none';
+    contentEl.style.display = '';
+
+    const n = totalItems(cart);
+    const sub = subtotal(cart);
+    const shipping = sub >= 100 ? (lang === 'fr' ? 'Gratuit' : 'Free') : (lang === 'fr' ? 'À calculer' : 'Calculated at checkout');
+
+    itemsLabelEl.textContent = `${n} ${lang === 'fr' ? (n === 1 ? 'article' : 'articles') : (n === 1 ? 'item' : 'items')}`;
+    subtotalEl.textContent = `$${sub.toFixed(2)}`;
+    shippingEl.textContent = shipping;
+    totalEl.textContent = `$${sub.toFixed(2)}`;
+
+    itemsEl.innerHTML = cart.map((item) => `
+      <div class="cart-item" data-id="${item.id}">
+        <img src="${item.image}" alt="${item.name}" />
+        <div class="cart-item-info">
+          <h3>${item.name}</h3>
+          <p class="price">$${item.price.toFixed(2)}</p>
+          <div class="qty-controls">
+            <button type="button" class="qty-dec" data-id="${item.id}" aria-label="Decrease quantity">−</button>
+            <span>${item.quantity}</span>
+            <button type="button" class="qty-inc" data-id="${item.id}" aria-label="Increase quantity">+</button>
+          </div>
+          <button type="button" class="remove-btn" data-id="${item.id}">${lang === 'fr' ? 'Supprimer' : 'Remove'}</button>
+        </div>
+      </div>
+    `).join('');
+
+    // Bind events
+    itemsEl.querySelectorAll<HTMLButtonElement>('.qty-dec').forEach((btn) => {
+      btn.addEventListener('click', () => { updateQuantity(btn.dataset.id!, -1); renderCart(); });
+    });
+    itemsEl.querySelectorAll<HTMLButtonElement>('.qty-inc').forEach((btn) => {
+      btn.addEventListener('click', () => { updateQuantity(btn.dataset.id!, 1); renderCart(); });
+    });
+    itemsEl.querySelectorAll<HTMLButtonElement>('.remove-btn').forEach((btn) => {
+      btn.addEventListener('click', () => { removeFromCart(btn.dataset.id!); renderCart(); });
+    });
+  }
+
+  renderCart();
+  window.addEventListener('cart-updated', renderCart);
+
+  document.getElementById('checkout-btn')?.addEventListener('click', () => {
+    const toast = document.getElementById('newsletter-toast');
+    const toastText = document.getElementById('newsletter-toast-text');
+    if (toast && toastText) {
+      toastText.textContent = lang === 'fr' ? 'Paiement bientôt disponible!' : 'Checkout coming soon!';
+      toast.classList.add('show');
+      clearTimeout((window as any)._toastTimeout);
+      (window as any)._toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  });
+</script>

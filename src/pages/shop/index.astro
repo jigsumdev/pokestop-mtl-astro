@@ -1,0 +1,245 @@
+---
+/*
+  shop/index.astro — PokéStop MTL
+  Shop page: tries to load products from Medusa; falls back to static catalog.
+  Filtering and sorting are handled client-side via vanilla JS.
+*/
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import { useTranslations } from "../../data/i18n";
+import { products as staticProducts } from "../../data/products";
+import { fetchMedusaProducts, medusaProductToCard } from "../../lib/medusa";
+import type { Product } from "../../data/products";
+
+const locale = "en";
+const t = useTranslations(locale);
+
+// Try Medusa first, fall back to static
+let shopProducts: { id: string; name: string; price: number; image: string; stock: number; badge?: string; grade?: string; category?: string }[] = [];
+let usingMedusa = false;
+
+const medusaData = await fetchMedusaProducts({ limit: 100 });
+if (medusaData && medusaData.products.length > 0) {
+  shopProducts = medusaData.products.map(medusaProductToCard);
+  usingMedusa = true;
+} else {
+  shopProducts = staticProducts.map((p: Product) => ({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    image: p.image,
+    stock: p.stock,
+    badge: p.badge,
+    grade: p.grade,
+    category: p.category,
+  }));
+}
+
+const categories = usingMedusa
+  ? []
+  : ["pokemon-cards", "one-piece", "magic", "marketplace"];
+---
+
+<BaseLayout locale={locale} title={t.shop.title}>
+  <!-- Page hero -->
+  <section class="page-hero" aria-label={t.shop.title}>
+    <div class="bg">
+      <img
+        src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=1920&q=80"
+        alt=""
+        loading="lazy"
+      />
+      <div class="overlay" aria-hidden="true"></div>
+    </div>
+    <div class="container">
+      <h1>{t.shop.title}</h1>
+      <p>
+        {usingMedusa
+          ? `${shopProducts.length} products from our Medusa store`
+          : `${shopProducts.length} items in our collection`}
+      </p>
+    </div>
+  </section>
+
+  <div class="container" style="padding-top:2.5rem;padding-bottom:5rem">
+    <!-- Shop header -->
+    <div class="shop-header">
+      <div>
+        <h1 id="shop-heading">{t.shop.title}</h1>
+        <p class="results" id="results-count">{shopProducts.length} results</p>
+      </div>
+      <div class="shop-toolbar">
+        <!-- Mobile filter toggle -->
+        <button type="button" class="filter-toggle-mobile" id="filter-toggle" aria-label={t.shop.filters} aria-expanded="false" aria-controls="shop-sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+            <line x1="4" y1="6" x2="20" y2="6"/>
+            <line x1="8" y1="12" x2="20" y2="12"/>
+            <line x1="12" y1="18" x2="20" y2="18"/>
+          </svg>
+        </button>
+        <!-- Sort -->
+        <select id="sort-select" aria-label="Sort products">
+          <option value="newest">{t.shop.sort.newest}</option>
+          <option value="price_low">{t.shop.sort.price_low}</option>
+          <option value="price_high">{t.shop.sort.price_high}</option>
+          <option value="name">{t.shop.sort.name}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="shop-layout">
+      <!-- Sidebar filters -->
+      <aside class="shop-sidebar" id="shop-sidebar" aria-label={t.shop.filters}>
+        <button type="button" class="clear-filters" id="clear-filters">{t.shop.clear_filters}</button>
+
+        {!usingMedusa && (
+          <div class="filter-section">
+            <h4>Category</h4>
+            {categories.map((cat) => (
+              <label>
+                <input type="checkbox" class="cat-filter" value={cat} />
+                {cat.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              </label>
+            ))}
+          </div>
+        )}
+
+        <div class="filter-section">
+          <h4>Badge</h4>
+          {["new", "hot", "rare", "sale"].map((b) => (
+            <label>
+              <input type="checkbox" class="badge-filter" value={b} />
+              {b.charAt(0).toUpperCase() + b.slice(1)}
+            </label>
+          ))}
+        </div>
+
+        <div class="filter-section">
+          <h4>Price Range</h4>
+          <label>
+            <input type="checkbox" class="price-filter" value="0-100" />
+            Under $100
+          </label>
+          <label>
+            <input type="checkbox" class="price-filter" value="100-500" />
+            $100 – $500
+          </label>
+          <label>
+            <input type="checkbox" class="price-filter" value="500-2000" />
+            $500 – $2,000
+          </label>
+          <label>
+            <input type="checkbox" class="price-filter" value="2000-99999" />
+            Over $2,000
+          </label>
+        </div>
+      </aside>
+
+      <!-- Product grid -->
+      <main class="shop-main" id="shop-main">
+        <div class="product-grid" id="product-grid">
+          {shopProducts.map((p) => (
+            <ProductCard
+              id={p.id}
+              name={p.name}
+              price={p.price}
+              image={p.image}
+              badge={p.badge as any}
+              grade={p.grade}
+              stock={p.stock}
+              locale={locale}
+            />
+          ))}
+        </div>
+        <div class="shop-no-results" id="no-results" style="display:none">
+          <p>{t.shop.no_results}</p>
+          <button type="button" id="clear-filters-inline">{t.shop.clear_filters}</button>
+        </div>
+      </main>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { initProductCards, initProductPopup } from "../../scripts/cart";
+  initProductCards();
+  initProductPopup();
+
+  // Filter & sort logic
+  const grid = document.getElementById('product-grid')!;
+  const noResults = document.getElementById('no-results')!;
+  const resultsCount = document.getElementById('results-count')!;
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+  const clearBtns = document.querySelectorAll('#clear-filters, #clear-filters-inline');
+  const filterToggle = document.getElementById('filter-toggle') as HTMLButtonElement;
+  const sidebar = document.getElementById('shop-sidebar') as HTMLElement;
+
+  // Mobile sidebar toggle
+  filterToggle?.addEventListener('click', () => {
+    const isOpen = sidebar.classList.toggle('mobile-open');
+    filterToggle.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  // Collect all product cards
+  const allCards = Array.from(grid.querySelectorAll<HTMLElement>('.product-card'));
+
+  function applyFilters() {
+    const activeCats = Array.from(document.querySelectorAll<HTMLInputElement>('.cat-filter:checked')).map((el) => el.value);
+    const activeBadges = Array.from(document.querySelectorAll<HTMLInputElement>('.badge-filter:checked')).map((el) => el.value);
+    const activePrices = Array.from(document.querySelectorAll<HTMLInputElement>('.price-filter:checked')).map((el) => el.value);
+    const sortVal = sortSelect.value;
+
+    let visible = allCards.filter((card) => {
+      const cat = card.closest('[data-category]')?.getAttribute('data-category') ?? '';
+      const badge = card.querySelector('.badge')?.textContent?.toLowerCase().trim() ?? '';
+      const price = parseFloat(card.dataset.productPrice ?? '0');
+
+      if (activeCats.length > 0 && !activeCats.includes(cat)) return false;
+      if (activeBadges.length > 0 && !activeBadges.includes(badge)) return false;
+      if (activePrices.length > 0) {
+        const inRange = activePrices.some((r) => {
+          const [min, max] = r.split('-').map(Number);
+          return price >= min && price <= max;
+        });
+        if (!inRange) return false;
+      }
+      return true;
+    });
+
+    // Sort
+    visible.sort((a, b) => {
+      const pa = parseFloat(a.dataset.productPrice ?? '0');
+      const pb = parseFloat(b.dataset.productPrice ?? '0');
+      const na = a.dataset.productName ?? '';
+      const nb = b.dataset.productName ?? '';
+      if (sortVal === 'price_low') return pa - pb;
+      if (sortVal === 'price_high') return pb - pa;
+      if (sortVal === 'name') return na.localeCompare(nb);
+      return 0; // newest: keep original order
+    });
+
+    // Hide all, show visible in order
+    allCards.forEach((c) => (c.style.display = 'none'));
+    visible.forEach((c) => (c.style.display = ''));
+
+    // Re-append in sorted order
+    visible.forEach((c) => grid.appendChild(c));
+
+    resultsCount.textContent = `${visible.length} result${visible.length !== 1 ? 's' : ''}`;
+    noResults.style.display = visible.length === 0 ? '' : 'none';
+    grid.style.display = visible.length === 0 ? 'none' : '';
+  }
+
+  document.querySelectorAll('.cat-filter, .badge-filter, .price-filter').forEach((cb) => {
+    cb.addEventListener('change', applyFilters);
+  });
+  sortSelect.addEventListener('change', applyFilters);
+
+  clearBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll<HTMLInputElement>('.cat-filter, .badge-filter, .price-filter').forEach((cb) => (cb.checked = false));
+      sortSelect.value = 'newest';
+      applyFilters();
+    });
+  });
+</script>

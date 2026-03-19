@@ -1,0 +1,100 @@
+---
+/*
+  BaseLayout.astro — PokéStop MTL
+  Design: Dark vault aesthetic, Barlow Condensed display + Inter body
+  Provides: HTML shell, global styles, SEO meta, i18n hreflang links
+*/
+import "../styles/global.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import { useTranslations } from "../data/i18n";
+import type { SupportedLocale } from "../data/i18n";
+
+interface Props {
+  title?: string;
+  description?: string;
+  locale?: SupportedLocale;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description,
+  locale = "en",
+  ogImage = "/og-image.png",
+} = Astro.props;
+
+const t = useTranslations(locale);
+const pageTitle = title ? `${title} — ${t.site.name}` : `${t.site.name} — ${t.site.tagline}`;
+const pageDesc = description ?? t.site.description;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? "https://pokestopmtl.com");
+const altLocale = locale === "en" ? "fr" : "en";
+const altPath = locale === "en"
+  ? `/fr${Astro.url.pathname}`
+  : Astro.url.pathname.replace(/^\/fr/, "") || "/";
+---
+
+<!doctype html>
+<html lang={locale} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href={new URL(locale === "fr" ? altPath : Astro.url.pathname, Astro.site ?? "https://pokestopmtl.com")} />
+    <link rel="alternate" hreflang="fr" href={new URL(locale === "en" ? altPath : Astro.url.pathname, Astro.site ?? "https://pokestopmtl.com")} />
+    <link rel="alternate" hreflang="x-default" href={new URL(locale === "fr" ? altPath : Astro.url.pathname, Astro.site ?? "https://pokestopmtl.com")} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site ?? "https://pokestopmtl.com")} />
+    <meta property="og:locale" content={locale === "fr" ? "fr_CA" : "en_CA"} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDesc} />
+    <meta name="twitter:image" content={new URL(ogImage, Astro.site ?? "https://pokestopmtl.com")} />
+
+    <!-- Fonts preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <SiteHeader locale={locale} />
+    <main id="main-content">
+      <slot />
+    </main>
+    <SiteFooter locale={locale} />
+
+    <!-- Product popup (shared) -->
+    <div id="product-popup-overlay" class="product-popup-overlay hidden" aria-modal="true" role="dialog" aria-hidden="true">
+      <div class="product-popup">
+        <div class="popup-img">
+          <img id="product-popup-image" src="" alt="" loading="lazy" />
+        </div>
+        <div class="popup-info">
+          <button type="button" class="popup-close" id="product-popup-close" aria-label="Close">✕</button>
+          <h2 class="popup-title" id="product-popup-title"></h2>
+          <p class="popup-price" id="product-popup-price"></p>
+          <p class="popup-status" id="product-popup-status"></p>
+          <button type="button" class="btn-primary" id="product-popup-buy">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="newsletter-toast" class="toast" role="status" aria-live="polite">
+      <span id="newsletter-toast-text"></span>
+    </div>
+  </body>
+</html>

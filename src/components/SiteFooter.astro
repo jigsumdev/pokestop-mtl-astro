@@ -1,0 +1,116 @@
+---
+/*
+  SiteFooter.astro — PokéStop MTL
+  Dark footer with brand column, quick links, categories, newsletter
+*/
+import { useTranslations, localePath } from "../data/i18n";
+import type { SupportedLocale } from "../data/i18n";
+
+interface Props {
+  locale: SupportedLocale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const year = new Date().getFullYear();
+
+const quickLinks = [
+  { href: localePath(locale, "/"), label: t.nav.home },
+  { href: localePath(locale, "/shop/"), label: t.nav.shop },
+  { href: localePath(locale, "/about/"), label: t.nav.about },
+  { href: localePath(locale, "/contact/"), label: t.nav.contact },
+  { href: localePath(locale, "/faq/"), label: t.nav.faq },
+];
+
+const categories = [
+  { href: localePath(locale, "/shop/"), label: t.cat.pokemon_cards },
+  { href: localePath(locale, "/shop/"), label: locale === "fr" ? "One Piece" : "One Piece" },
+  { href: localePath(locale, "/shop/"), label: locale === "fr" ? "Magic: The Gathering" : "Magic: The Gathering" },
+  { href: localePath(locale, "/mystery-packs/"), label: t.cat.mystery_packs },
+];
+---
+
+<footer class="footer" aria-label="Site footer">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Brand -->
+      <div class="footer-brand">
+        <a href={localePath(locale, "/")} class="logo" aria-label={t.site.name}>
+          <svg viewBox="0 0 36 36" fill="none" width="28" height="28" aria-hidden="true">
+            <circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="2"/>
+            <path d="M1 18h34M18 1a17 17 0 0 1 0 34" stroke="currentColor" stroke-width="2"/>
+            <circle cx="18" cy="18" r="5" fill="currentColor"/>
+          </svg>
+          PokéStop <span class="accent">MTL</span>
+        </a>
+        <p>{t.footer.tagline}</p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-col">
+        <h4>{t.footer.quick_links}</h4>
+        <ul>
+          {quickLinks.map((l) => (
+            <li><a href={l.href}>{l.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Categories -->
+      <div class="footer-col">
+        <h4>{t.footer.categories}</h4>
+        <ul>
+          {categories.map((c) => (
+            <li><a href={c.href}>{c.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="footer-col">
+        <h4>{t.footer.newsletter}</h4>
+        <p style="font-size:0.875rem;margin:0 0 0.5rem">{t.footer.newsletter_desc}</p>
+        <div class="newsletter-form">
+          <input
+            type="email"
+            id="footer-email"
+            placeholder={t.footer.email_placeholder}
+            aria-label={t.footer.email_placeholder}
+          />
+          <button type="button" id="newsletter-btn">{t.footer.subscribe}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="footer-bottom">
+      <span>&copy; {year} {t.site.name}. {t.footer.rights}</span>
+      <div class="footer-bottom-links">
+        <a href={localePath(locale, "/privacy/")}>{t.footer.privacy}</a>
+        <a href={localePath(locale, "/terms/")}>{t.footer.terms}</a>
+        <a href={localePath(locale, "/shipping/")}>{t.footer.shipping}</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const btn = document.getElementById('newsletter-btn');
+  const emailInput = document.getElementById('footer-email') as HTMLInputElement;
+  const toast = document.getElementById('newsletter-toast');
+  const toastText = document.getElementById('newsletter-toast-text');
+
+  btn?.addEventListener('click', () => {
+    if (!emailInput || !toast || !toastText) return;
+    const email = emailInput.value.trim();
+    if (!email) return;
+    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    toastText.textContent = isValid
+      ? (document.documentElement.lang === 'fr' ? 'Vous êtes abonné!' : "You're subscribed!")
+      : (document.documentElement.lang === 'fr' ? 'Veuillez entrer un courriel valide.' : 'Please enter a valid email.');
+    toast.classList.remove('toast-error');
+    if (!isValid) toast.classList.add('toast-error');
+    toast.classList.add('show');
+    clearTimeout((window as any)._toastTimeout);
+    (window as any)._toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
+  });
+</script>

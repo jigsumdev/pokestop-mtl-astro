@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { useTranslations } from "../data/i18n";
+import { mysteryPacks } from "../data/products";
+
+const locale = "en";
+const t = useTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={t.mystery.title}>
+  <section class="mystery-section" style="padding-top:6rem;padding-bottom:4rem">
+    <div class="container">
+      <div class="section-header section-header-center" style="margin-bottom:3rem">
+        <h2 style="color:#fff">{t.mystery.title}</h2>
+        <p>{t.mystery.subtitle}</p>
+        <div class="mystery-divider" aria-hidden="true"></div>
+      </div>
+
+      <!-- How it works -->
+      <div class="how-it-works">
+        <h2>{t.mystery.how_title}</h2>
+        <div class="how-steps">
+          {t.mystery.steps.map((step, i) => (
+            <div class="how-step">
+              <div class="step-num" aria-hidden="true">{i + 1}</div>
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {mysteryPacks.length === 0 ? (
+        <div style="text-align:center;padding:4rem 2rem;color:rgba(255,255,255,0.5)">
+          <p style="font-size:1.125rem">No mystery packs available right now.</p>
+          <p>Check back soon for exciting new packs!</p>
+          <a href="/shop/" class="btn-primary" style="margin-top:1.5rem;display:inline-flex">Browse Shop</a>
+        </div>
+      ) : (
+        <div class="mystery-grid">
+          {mysteryPacks.map((p) => (
+            <div class="mystery-card">
+              <div class="img-wrap">
+                <img src={p.image} alt={p.name} loading="lazy" />
+              </div>
+              <div class="info">
+                <h3>{p.name}</h3>
+                <p>{p.nameFr}</p>
+                <span class="price">${p.price.toFixed(2)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
