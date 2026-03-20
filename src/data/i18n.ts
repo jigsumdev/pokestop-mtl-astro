@@ -13,9 +13,42 @@ export function getAlternateLocale(locale: SupportedLocale): SupportedLocale {
   return locale === "en" ? "fr" : "en";
 }
 
+const frSlugMap: Record<string, string> = {
+  "/shop/": "/boutique/",
+  "/about/": "/a-propos/",
+  "/cart/": "/panier/",
+};
+
+const canonicalFromFrSlugMap = Object.fromEntries(
+  Object.entries(frSlugMap).map(([canonical, frSlug]) => [frSlug, canonical]),
+) as Record<string, string>;
+
+function normalizePath(path: string): string {
+  if (!path) return "/";
+  if (path === "/") return "/";
+  const withLeadingSlash = path.startsWith("/") ? path : `/${path}`;
+  return withLeadingSlash.endsWith("/") ? withLeadingSlash : `${withLeadingSlash}/`;
+}
+
+function toCanonicalPath(path: string): string {
+  const normalized = normalizePath(path);
+  if (!normalized.startsWith("/fr/") && normalized !== "/fr/") {
+    return normalized;
+  }
+
+  const unprefixed = normalized === "/fr/" ? "/" : normalized.replace(/^\/fr/, "");
+  return canonicalFromFrSlugMap[unprefixed] ?? unprefixed;
+}
+
 export function localePath(locale: SupportedLocale, path: string): string {
-  if (locale === "en") return path;
-  return `/fr${path}`;
+  const canonicalPath = toCanonicalPath(path);
+  if (locale === "en") return canonicalPath;
+  const localizedPath = frSlugMap[canonicalPath] ?? canonicalPath;
+  return `/fr${localizedPath}`;
+}
+
+export function switchLocalePath(path: string, targetLocale: SupportedLocale): string {
+  return localePath(targetLocale, path);
 }
 
 export const faqItems = [

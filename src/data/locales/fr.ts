@@ -12,8 +12,6 @@ export const fr = {
   nav: {
     home: "Accueil",
     shop: "Boutique",
-    pokemon_cards: "Cartes",
-    account: "Compte",
     about: "À propos",
     contact: "Contact",
     faq: "FAQ",
@@ -76,34 +74,39 @@ export const fr = {
   },
   about: {
     title: "À Propos de PokéStop MTL",
-    subtitle: "Votre source de confiance pour les cartes à collectionner premium",
+    subtitle: "Passion, Connaissance & Confiance Depuis les Années 1990",
     story_title: "Notre Histoire",
-    story:
-      "Né d'une passion pour la collection, PokéStop MTL a été fondé par des passionnés dévoués qui voulaient créer un marché de confiance pour les collectionneurs de cartes à Montréal et au-delà.",
+    story: [
+      "Passionnés de l'univers Pokémon, du manga et du collectionnement depuis les années 1990, nous cumulons aujourd'hui plus de 12 ans d'expérience dans le domaine de la collection spécialisée. Pendant longtemps, cette expérience est restée avant tout personnelle\u00a0: une passion développée au fil des années, des recherches, des découvertes et d'une compréhension approfondie d'un marché parfois complexe et en constante évolution.",
+      "Aujourd'hui, nous avons choisi de transformer cette passion en véritable mission d'entreprise, avec une vision construite autour de valeurs familiales, de proximité et de confiance. Notre objectif n'est pas seulement de proposer des produits, mais de créer un espace où les collectionneurs, passionnés et curieux peuvent trouver des articles parfois difficiles d'accès, obtenir des réponses claires et bénéficier d'un accompagnement basé sur une expérience réelle du terrain.",
+    ],
     mission_title: "Notre Mission",
-    mission:
-      "Offrir aux collectionneurs un marché de confiance où chaque carte est authentifiée et chaque transaction est transparente.",
+    mission: [
+      "Notre mission est de rendre accessibles les produits Pokémon, mangas et objets de collection les plus rares, recherchés ou nichés, dans un environnement spécialisé où la passion, la connaissance et la confiance sont au centre de l'expérience.",
+      "Nous voulons bâtir une relation durable avec notre clientèle en comprenant leurs besoins, leurs recherches et leurs objectifs de collection. Que ce soit pour trouver une pièce précise, découvrir un produit niché ou mieux comprendre certaines réalités du marché, nous croyons qu'un bon service passe d'abord par l'écoute, la transparence et le partage de connaissances.",
+      "Notre rôle est aussi d'aider nos clients à évoluer dans cet univers en mettant à leur disposition notre expertise et notre passion, afin qu'ils puissent faire des choix éclairés selon leurs intérêts personnels.",
+    ],
     values_title: "Nos Valeurs",
     values: [
       {
-        icon: "shield",
-        title: "Authenticité",
-        desc: "Chaque carte est vérifiée par notre équipe d'experts.",
+        icon: "star",
+        title: "Passion & Expertise",
+        desc: "Plus de 12 ans d'expérience terrain dans la collection spécialisée, portée par un amour sincère de l'univers.",
       },
       {
-        icon: "star",
-        title: "Qualité",
-        desc: "Nous ne vendons que des cartes dans l'état que nous décrivons.",
+        icon: "shield",
+        title: "Confiance & Transparence",
+        desc: "Des conseils clairs, des évaluations honnêtes et un engagement à bâtir une relation durable avec chaque client.",
       },
       {
         icon: "heart",
-        title: "Communauté",
-        desc: "Nous sommes aussi des collectionneurs — nous comprenons votre passion.",
+        title: "Accessibilité",
+        desc: "Rendre accessibles les produits rares, recherchés et nichés aux collectionneurs qui peinent parfois à les trouver.",
       },
       {
-        icon: "truck",
-        title: "Fiabilité",
-        desc: "Livraison rapide et assurée avec suivi complet.",
+        icon: "compass",
+        title: "Accompagnement",
+        desc: "Aider les collectionneurs à faire des choix éclairés en partageant nos connaissances et notre compréhension du marché.",
       },
     ],
   },
@@ -135,25 +138,6 @@ export const fr = {
     free_shipping: "Livraison gratuite pour les commandes de plus de 100$",
   },
   order_summary: "Résumé de la Commande",
-  account: {
-    title: "Mon Compte",
-    login: "Se Connecter",
-    register: "Créer un Compte",
-  },
-  condition: {
-    mint: "Parfait",
-    near_mint: "Quasi-Parfait",
-    excellent: "Excellent",
-    good: "Bon",
-    played: "Joué",
-  },
-  rarity: {
-    common: "Commun",
-    uncommon: "Peu Commun",
-    rare: "Rare",
-    ultra_rare: "Ultra Rare",
-    secret_rare: "Rare Secret",
-  },
   footer: {
     tagline:
       "Votre source de confiance pour les cartes à collectionner et collectibles premium à Montréal.",

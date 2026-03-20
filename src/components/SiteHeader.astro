@@ -3,7 +3,7 @@
   SiteHeader.astro — PokéStop MTL
   Dark frosted-glass navbar with gold accent line, search, language switcher, cart badge
 */
-import { useTranslations, localePath } from "../data/i18n";
+import { useTranslations, localePath, switchLocalePath } from "../data/i18n";
 import type { SupportedLocale } from "../data/i18n";
 
 interface Props {
@@ -16,7 +16,6 @@ const altLocale = locale === "en" ? "fr" : "en";
 const navLinks = [
   { href: localePath(locale, "/"), label: t.nav.home, key: "home" },
   { href: localePath(locale, "/shop/"), label: t.nav.shop, key: "shop" },
-  { href: localePath(locale, "/cards/"), label: t.nav.pokemon_cards, key: "cards" },
   { href: localePath(locale, "/about/"), label: t.nav.about, key: "about" },
   { href: localePath(locale, "/contact/"), label: t.nav.contact, key: "contact" },
 ];
@@ -59,7 +58,7 @@ const currentPath = Astro.url.pathname;
       </button>
 
       <!-- Language switcher -->
-      <a href={altLocale === "fr" ? `/fr${currentPath.replace(/^\/fr/, "") || "/"}` : currentPath.replace(/^\/fr/, "") || "/"} class="lang-btn" aria-label={`Switch to ${altLocale === "fr" ? "Français" : "English"}`}>
+      <a href={switchLocalePath(currentPath, altLocale)} class="lang-btn" aria-label={`Switch to ${altLocale === "fr" ? "Français" : "English"}`}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
           <circle cx="12" cy="12" r="10"/>
           <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>

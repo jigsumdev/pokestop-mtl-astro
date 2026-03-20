@@ -1,0 +1,16 @@
+# Local-only vars for `wrangler pages dev dist`
+# Copy this file to `.dev.vars` and fill in real values.
+
+# Public (used by Astro build and/or functions)
+PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000
+PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_replace_me
+PUBLIC_MEDUSA_USE_PROXY=true
+
+# Secrets (used by Pages Functions / sync)
+MEDUSA_ADMIN_EMAIL=replace_me@example.com
+MEDUSA_ADMIN_PASSWORD=replace_me
+ADMIN_SYNC_TOKEN=replace_me
+
+# Optional: comma-separated origins allowed to POST to protected endpoints
+# ALLOWED_ORIGINS=https://pokestopmtl.com,https://<your-pages-domain>
+

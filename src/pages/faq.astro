@@ -8,9 +8,9 @@ const t = useTranslations(locale);
 
 <BaseLayout locale={locale} title={t.faq.title}>
   <div class="container" style="padding-top:6rem;padding-bottom:5rem;max-width:48rem">
-    <div style="text-align:center;margin-bottom:3rem">
-      <h1 style="font-family:var(--font-display);font-size:2.5rem;font-weight:800;margin:0 0 0.75rem">{t.faq.title}</h1>
-      <p style="color:var(--text-soft);font-size:1.125rem;margin:0">{t.faq.subtitle}</p>
+    <div class="page-title-wrap">
+      <h1 class="page-title">{t.faq.title}</h1>
+      <p class="page-subtitle">{t.faq.subtitle}</p>
     </div>
 
     <div id="faq-list">

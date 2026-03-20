@@ -7,7 +7,7 @@
 import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
-import { useTranslations } from "../data/i18n";
+import { useTranslations, switchLocalePath } from "../data/i18n";
 import type { SupportedLocale } from "../data/i18n";
 
 interface Props {
@@ -28,10 +28,8 @@ const t = useTranslations(locale);
 const pageTitle = title ? `${title} — ${t.site.name}` : `${t.site.name} — ${t.site.tagline}`;
 const pageDesc = description ?? t.site.description;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? "https://pokestopmtl.com");
-const altLocale = locale === "en" ? "fr" : "en";
-const altPath = locale === "en"
-  ? `/fr${Astro.url.pathname}`
-  : Astro.url.pathname.replace(/^\/fr/, "") || "/";
+const enAltPath = switchLocalePath(Astro.url.pathname, "en");
+const frAltPath = switchLocalePath(Astro.url.pathname, "fr");
 ---
 
 <!doctype html>
@@ -44,9 +42,9 @@ const altPath = locale === "en"
     <link rel="canonical" href={canonicalURL} />
 
     <!-- hreflang -->
-    <link rel="alternate" hreflang="en" href={new URL(locale === "fr" ? altPath : Astro.url.pathname, Astro.site ?? "https://pokestopmtl.com")} />
-    <link rel="alternate" hreflang="fr" href={new URL(locale === "en" ? altPath : Astro.url.pathname, Astro.site ?? "https://pokestopmtl.com")} />
-    <link rel="alternate" hreflang="x-default" href={new URL(locale === "fr" ? altPath : Astro.url.pathname, Astro.site ?? "https://pokestopmtl.com")} />
+    <link rel="alternate" hreflang="en" href={new URL(enAltPath, Astro.site ?? "https://pokestopmtl.com")} />
+    <link rel="alternate" hreflang="fr" href={new URL(frAltPath, Astro.site ?? "https://pokestopmtl.com")} />
+    <link rel="alternate" hreflang="x-default" href={new URL(enAltPath, Astro.site ?? "https://pokestopmtl.com")} />
 
     <!-- Open Graph -->
     <meta property="og:title" content={pageTitle} />
@@ -80,13 +78,23 @@ const altPath = locale === "en"
     <div id="product-popup-overlay" class="product-popup-overlay hidden" aria-modal="true" role="dialog" aria-hidden="true">
       <div class="product-popup">
         <div class="popup-img">
+          <span class="popup-badge badge" id="product-popup-badge-chip" style="display:none"></span>
           <img id="product-popup-image" src="" alt="" loading="lazy" />
         </div>
         <div class="popup-info">
           <button type="button" class="popup-close" id="product-popup-close" aria-label="Close">✕</button>
           <h2 class="popup-title" id="product-popup-title"></h2>
+          <p class="popup-subtitle" id="product-popup-subtitle"></p>
           <p class="popup-price" id="product-popup-price"></p>
           <p class="popup-status" id="product-popup-status"></p>
+          <dl class="popup-details" id="product-popup-details">
+            <div id="product-popup-row-category"><dt>Category</dt><dd id="product-popup-category">-</dd></div>
+            <div id="product-popup-row-grade"><dt>Grade</dt><dd id="product-popup-grade">-</dd></div>
+            <div id="product-popup-row-condition"><dt>Condition</dt><dd id="product-popup-condition">-</dd></div>
+            <div id="product-popup-row-rarity"><dt>Rarity</dt><dd id="product-popup-rarity">-</dd></div>
+            <div id="product-popup-row-sku"><dt>SKU</dt><dd id="product-popup-sku">-</dd></div>
+            <div id="product-popup-row-stock"><dt>Stock</dt><dd id="product-popup-stock">-</dd></div>
+          </dl>
           <button type="button" class="btn-primary" id="product-popup-buy">Add to Cart</button>
         </div>
       </div>

@@ -12,8 +12,6 @@ export const en = {
   nav: {
     home: "Home",
     shop: "Shop",
-    pokemon_cards: "Cards",
-    account: "Account",
     about: "About",
     contact: "Contact",
     faq: "FAQ",
@@ -76,34 +74,39 @@ export const en = {
   },
   about: {
     title: "About PokéStop MTL",
-    subtitle: "Your trusted source for premium trading cards",
+    subtitle: "Passion, Knowledge & Trust Since the 1990s",
     story_title: "Our Story",
-    story:
-      "Born from a passion for collecting, PokéStop MTL was founded by dedicated enthusiasts who wanted to create a trustworthy marketplace for trading card collectors in Montréal and beyond.",
+    story: [
+      "As long-time enthusiasts of the Pokémon universe, manga culture, and collecting since the 1990s, we now bring together more than 12 years of experience in specialized collecting. For many years, this experience remained deeply personal — a passion built through research, discoveries, market understanding, and a strong connection to a constantly evolving collecting world.",
+      "Today, we have chosen to turn that passion into a true business mission, built around family values, proximity, and trust. Our goal is not simply to offer products, but to create a space where collectors, enthusiasts, and newcomers can find hard-to-access items, receive clear guidance, and benefit from real hands-on experience in the field.",
+    ],
     mission_title: "Our Mission",
-    mission:
-      "To provide collectors with a trustworthy marketplace where every card is authenticated and every transaction is transparent.",
+    mission: [
+      "Our mission is to make rare, sought-after, and niche Pokémon, manga, and collectible products more accessible through a specialized environment where passion, knowledge, and trust are at the center of the experience.",
+      "We aim to build lasting relationships with our customers by understanding their needs, their searches, and their collecting goals. Whether someone is looking for a specific piece, discovering niche products, or seeking a better understanding of the market, we believe great service begins with listening, transparency, and the sharing of knowledge.",
+      "Our role is also to help customers navigate this universe by making our expertise and passion available, so they can make informed decisions based on their own interests and collecting journey.",
+    ],
     values_title: "Our Values",
     values: [
       {
-        icon: "shield",
-        title: "Authenticity",
-        desc: "Every card is verified by our expert team.",
+        icon: "star",
+        title: "Passion & Expertise",
+        desc: "Over 12 years of hands-on experience in specialized collecting, driven by a genuine love for the universe.",
       },
       {
-        icon: "star",
-        title: "Quality",
-        desc: "We only sell cards in the condition we describe.",
+        icon: "shield",
+        title: "Trust & Transparency",
+        desc: "Clear guidance, honest assessments, and a commitment to building lasting relationships with every customer.",
       },
       {
         icon: "heart",
-        title: "Community",
-        desc: "We are collectors too — we understand your passion.",
+        title: "Accessibility",
+        desc: "Making rare, sought-after, and niche products available to collectors who might otherwise struggle to find them.",
       },
       {
-        icon: "truck",
-        title: "Reliability",
-        desc: "Fast, insured shipping with full tracking.",
+        icon: "compass",
+        title: "Guidance",
+        desc: "Helping collectors make informed decisions by sharing our knowledge and understanding of the market.",
       },
     ],
   },
@@ -135,25 +138,6 @@ export const en = {
     free_shipping: "Free shipping on orders over $100",
   },
   order_summary: "Order Summary",
-  account: {
-    title: "My Account",
-    login: "Sign In",
-    register: "Create Account",
-  },
-  condition: {
-    mint: "Mint",
-    near_mint: "Near Mint",
-    excellent: "Excellent",
-    good: "Good",
-    played: "Played",
-  },
-  rarity: {
-    common: "Common",
-    uncommon: "Uncommon",
-    rare: "Rare",
-    ultra_rare: "Ultra Rare",
-    secret_rare: "Secret Rare",
-  },
   footer: {
     tagline: "Your trusted source for premium trading cards and collectibles in Montréal.",
     quick_links: "Quick Links",

@@ -5,21 +5,25 @@
   "scripts": {
     "dev": "astro dev --port 3000",
     "dev:medusa": "cross-env PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000 PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_9a9678674b41f8e34ae3ced81452c137eb26a87d13d863eb55df937aa993ae18 astro dev --port 3000",
-    "build": "astro build",
+    "build": "astro build && node scripts/postbuild.mjs",
     "preview": "astro preview",
     "check": "astro check",
-    "pages:dev": "wrangler pages dev dist"
+    "pages:dev": "wrangler pages dev dist",
+    "sync": "tsx --env-file=.env.local src/scripts/sync-collectr-to-medusa.ts",
+    "sync:dry": "tsx --env-file=.env.local src/scripts/sync-collectr-to-medusa.ts --dry-run"
   },
   "dependencies": {
-    "@astrojs/react": "^5.0.0",
     "@astrojs/sitemap": "^3.7.1",
     "@astrojs/tailwind": "^6.0.2",
-    "astro": "^6.0.5",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "astro": "^5.18.1",
     "tailwindcss": "^3"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "@astrojs/check": "^0.9.8",
+    "baseline-browser-mapping": "^2.10.8",
+    "cross-env": "^7.0.3",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.73.0"
   }
 }

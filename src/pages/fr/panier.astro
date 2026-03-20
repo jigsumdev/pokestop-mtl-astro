@@ -20,7 +20,9 @@ const t = useTranslations(locale);
     </div>
 
     <div id="cart-content" style="display:none">
-      <h1 style="font-family:var(--font-display);font-size:2.25rem;font-weight:800;margin:0 0 2rem">{t.cart.title}</h1>
+      <div class="page-title-wrap">
+        <h1 class="page-title">{t.cart.title}</h1>
+      </div>
       <div class="cart-layout">
         <div id="cart-items"></div>
         <div class="vault-card cart-summary">

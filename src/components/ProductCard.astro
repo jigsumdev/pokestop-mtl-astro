@@ -8,18 +8,21 @@ interface Props {
   name: string;
   price: number;
   image: string;
+  category?: string;
   badge?: string;
   grade?: string;
   condition?: string;
   rarity?: string;
+  sku?: string;
   stock?: number;
   locale?: string;
 }
 
-const { id, name, price, image, badge, grade, condition, rarity, stock = 1, locale = "en" } = Astro.props;
+const { id, name, price, image, category, badge, grade, condition, rarity, sku, stock = 1, locale = "en" } = Astro.props;
 const priceStr = price === 0 ? "Contact" : `$${price.toFixed(2)}`;
 const stripeParts = [grade, condition, rarity].filter(Boolean);
 const disabled = stock === 0;
+const stockStatus = stock === 0 ? (locale === "fr" ? "Vendu" : "Sold") : (locale === "fr" ? "Disponible" : "Available");
 ---
 
 <div
@@ -29,6 +32,13 @@ const disabled = stock === 0;
   data-product-price={price}
   data-product-image={image}
   data-product-stock={stock}
+  data-category={category}
+  data-badge={badge}
+  data-grade={grade}
+  data-condition={condition}
+  data-rarity={rarity}
+  data-sku={sku}
+  data-stock-status={stockStatus}
   role="button"
   tabindex="0"
   aria-label={`View ${name}`}

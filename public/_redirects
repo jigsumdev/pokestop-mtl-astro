@@ -1,2 +1,12 @@
+# Legacy French URLs -> current localized slugs
+/fr/shop /fr/boutique/ 301
+/fr/shop/ /fr/boutique/ 301
+/fr/about /fr/a-propos/ 301
+/fr/about/ /fr/a-propos/ 301
+
+# Normalize trailing slashes for common assets
+/robots.txt/ /robots.txt 301
+/sitemap.xml /sitemap-index.xml 301
+
 # Cloudflare Pages — SPA fallback (Astro static output handles routing)
 /fr/* /fr/:splat 200

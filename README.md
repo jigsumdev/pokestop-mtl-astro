@@ -14,6 +14,7 @@ Rebuilt from the original vanilla HTML/JS site into **Astro 6** with Tailwind CS
 | Shop backend | Medusa v2 Storefront API |
 | Cart | localStorage (client-side) |
 | Deployment | Cloudflare Pages |
+| Server endpoints | Cloudflare Pages Functions (`functions/`) |
 
 ---
 
@@ -56,21 +57,39 @@ src/
 public/
   favicon.svg
   robots.txt
+  _headers
   _redirects             — Cloudflare Pages redirects
+functions/
+  api/store/             — Medusa storefront proxy endpoints (Pages Functions)
+  api/admin/             — Protected admin endpoints (Pages Functions)
+scripts/
+  postbuild.mjs          — Post-build HTML optimization
+  setup-cloudflare-pages.ps1 — Create Pages project, upload secrets, deploy
 ```
 
 ---
 
 ## Connecting to Medusa
 
-1. Deploy your **Medusa v2** backend (Railway, Render, or self-hosted).
+Medusa is a full Node server. It does **not** run well on Cloudflare Workers.
+
+Recommended options:
+
+- **Low-cost / free-ish**: host Medusa on an external Node host (Railway/Render/Fly/VPS).
+- **Cloudflare-only**: run Medusa via **Cloudflare Containers** (usually not free).
+
+1. Deploy your **Medusa v2** backend and note its public URL.
 2. In Medusa Admin → **Settings → API Keys**, create a **Publishable** key.
-3. Add these secrets to your Manus project (Settings → Secrets):
+3. Configure environment variables:
 
    | Key | Value |
    |---|---|
-   | `PUBLIC_MEDUSA_BACKEND_URL` | `https://your-medusa.railway.app` |
+   | `PUBLIC_MEDUSA_BACKEND_URL` | `https://your-medusa.example.com` |
    | `PUBLIC_MEDUSA_PUBLISHABLE_KEY` | `pk_...` |
+   | `PUBLIC_MEDUSA_USE_PROXY` | `true` (recommended on Pages) |
+   | `MEDUSA_ADMIN_EMAIL` | admin email (for sync) |
+   | `MEDUSA_ADMIN_PASSWORD` | admin password (for sync) |
+   | `ADMIN_SYNC_TOKEN` | random secret (protects manual sync endpoint) |
 
 4. The shop pages (`/shop/`, `/fr/boutique/`) will automatically use Medusa products when the backend is reachable. If the backend is offline or the env vars are empty, the site falls back to the static `products.ts` catalog seamlessly.
 
@@ -96,6 +115,18 @@ bun run preview
 
 ## Deployment (Cloudflare Pages)
 
+### Local Pages runtime (Functions + headers)
+
+Pages Functions don’t run under `astro dev`. To emulate Cloudflare Pages locally:
+
+```powershell
+Copy-Item .dev.vars.example .dev.vars
+# edit .dev.vars with real values
+
+bun run build
+bunx --no-install wrangler pages dev dist
+```
+
 1. Push this repository to GitHub.
 2. In Cloudflare Pages → **Create a project** → connect the repo.
 3. Build settings:
@@ -103,6 +134,32 @@ bun run preview
    - **Build output directory**: `dist`
 4. Add environment variables (`PUBLIC_MEDUSA_BACKEND_URL`, `PUBLIC_MEDUSA_PUBLISHABLE_KEY`).
 5. Deploy.
+
+---
+
+## Manual Collectr → Medusa sync (production)
+
+There is a protected Pages Function endpoint:
+
+- `POST /api/admin/sync-collectr`
+
+Headers:
+- `X-Admin-Token: <ADMIN_SYNC_TOKEN>`
+
+Body:
+
+```json
+{
+  "dryRun": false,
+  "portfolio": []
+}
+```
+
+Notes:
+- This endpoint is for **manual admin use** and requires you to provide the portfolio payload.
+- Local CLI sync still exists:
+  - `bun run sync`
+  - `bun run sync:dry`
 
 ---
 

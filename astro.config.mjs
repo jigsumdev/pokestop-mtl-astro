@@ -1,7 +1,6 @@
 import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
-import react from "@astrojs/react";
 
 const isGitHubPages = process.env.GITHUB_PAGES === "true";
 
@@ -14,7 +13,6 @@ export default defineConfig({
   trailingSlash: "always",
   integrations: [
     tailwind({ applyBaseStyles: false }),
-    react(),
     sitemap({
       i18n: {
         defaultLocale: "en",

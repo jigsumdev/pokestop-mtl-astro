@@ -9,16 +9,22 @@ import type { Product } from "../../../data/products";
 const locale = "fr";
 const t = useTranslations(locale);
 
-let shopProducts: { id: string; name: string; price: number; image: string; stock: number; badge?: string; grade?: string; category?: string }[] = [];
-let usingMedusa = false;
+let shopProducts: {
+  id: string; name: string; price: number; image: string; stock: number;
+  handle?: string; badge?: string; grade?: string; category?: string;
+  condition?: string; rarity?: string; sku?: string;
+}[] = [];
 
 const medusaData = await fetchMedusaProducts({ limit: 100 });
 if (medusaData && medusaData.products.length > 0) {
-  shopProducts = medusaData.products.map(medusaProductToCard);
-  usingMedusa = true;
+  shopProducts = medusaData.products.map((p) => {
+    const card = medusaProductToCard(p);
+    return { ...card, name: card.nameFr ?? card.name };
+  });
 } else {
   shopProducts = staticProducts.map((p: Product) => ({
     id: p.id,
+    handle: p.handle,
     name: p.nameFr,
     price: p.price,
     image: p.image,
@@ -26,26 +32,21 @@ if (medusaData && medusaData.products.length > 0) {
     badge: p.badge,
     grade: p.grade,
     category: p.category,
+    condition: p.condition,
+    rarity: p.rarity,
+    sku: p.sku,
   }));
 }
 ---
 
 <BaseLayout locale={locale} title={t.shop.title}>
-  <section class="page-hero" aria-label={t.shop.title}>
-    <div class="bg">
-      <img src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=1920&q=80" alt="" loading="lazy" />
-      <div class="overlay" aria-hidden="true"></div>
+  <div class="container" style="padding-top:6rem;padding-bottom:5rem">
+    <div class="page-title-wrap">
+      <h1 class="page-title">{t.shop.title}</h1>
     </div>
-    <div class="container">
-      <h1>{t.shop.title}</h1>
-      <p>{shopProducts.length} articles dans notre collection</p>
-    </div>
-  </section>
 
-  <div class="container" style="padding-top:2.5rem;padding-bottom:5rem">
     <div class="shop-header">
       <div>
-        <h1>{t.shop.title}</h1>
         <p class="results" id="results-count">{shopProducts.length} résultats</p>
       </div>
       <div class="shop-toolbar">
@@ -85,7 +86,7 @@ if (medusaData && medusaData.products.length > 0) {
       <main class="shop-main">
         <div class="product-grid" id="product-grid">
           {shopProducts.map((p) => (
-            <ProductCard id={p.id} name={p.name} price={p.price} image={p.image} badge={p.badge as any} grade={p.grade} stock={p.stock} locale={locale} />
+            <ProductCard id={p.id} name={p.name} price={p.price} image={p.image} category={p.category} badge={p.badge as any} grade={p.grade} condition={p.condition} rarity={p.rarity} sku={p.sku} stock={p.stock} locale={locale} />
           ))}
         </div>
         <div class="shop-no-results" id="no-results" style="display:none">

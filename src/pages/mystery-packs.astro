@@ -10,9 +10,9 @@ const t = useTranslations(locale);
 <BaseLayout locale={locale} title={t.mystery.title}>
   <section class="mystery-section" style="padding-top:6rem;padding-bottom:4rem">
     <div class="container">
-      <div class="section-header section-header-center" style="margin-bottom:3rem">
-        <h2 style="color:#fff">{t.mystery.title}</h2>
-        <p>{t.mystery.subtitle}</p>
+      <div class="page-title-wrap" style="margin-bottom:3rem">
+        <h1 class="page-title" style="color:#fff">{t.mystery.title}</h1>
+        <p class="page-subtitle" style="color:rgba(255,255,255,0.65)">{t.mystery.subtitle}</p>
         <div class="mystery-divider" aria-hidden="true"></div>
       </div>
 

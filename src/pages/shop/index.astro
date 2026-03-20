@@ -14,17 +14,20 @@ import type { Product } from "../../data/products";
 const locale = "en";
 const t = useTranslations(locale);
 
-// Try Medusa first, fall back to static
-let shopProducts: { id: string; name: string; price: number; image: string; stock: number; badge?: string; grade?: string; category?: string }[] = [];
-let usingMedusa = false;
+// Try Medusa first, fall back to static catalog
+let shopProducts: {
+  id: string; name: string; price: number; image: string; stock: number;
+  handle?: string; badge?: string; grade?: string; category?: string;
+  condition?: string; rarity?: string; sku?: string;
+}[] = [];
 
 const medusaData = await fetchMedusaProducts({ limit: 100 });
 if (medusaData && medusaData.products.length > 0) {
   shopProducts = medusaData.products.map(medusaProductToCard);
-  usingMedusa = true;
 } else {
   shopProducts = staticProducts.map((p: Product) => ({
     id: p.id,
+    handle: p.handle,
     name: p.name,
     price: p.price,
     image: p.image,
@@ -32,40 +35,25 @@ if (medusaData && medusaData.products.length > 0) {
     badge: p.badge,
     grade: p.grade,
     category: p.category,
+    condition: p.condition,
+    rarity: p.rarity,
+    sku: p.sku,
   }));
 }
 
-const categories = usingMedusa
-  ? []
-  : ["pokemon-cards", "one-piece", "magic", "marketplace"];
+const categories = ["pokemon-cards", "one-piece", "magic", "marketplace"];
 ---
 
 <BaseLayout locale={locale} title={t.shop.title}>
-  <!-- Page hero -->
-  <section class="page-hero" aria-label={t.shop.title}>
-    <div class="bg">
-      <img
-        src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=1920&q=80"
-        alt=""
-        loading="lazy"
-      />
-      <div class="overlay" aria-hidden="true"></div>
+  <div class="container" style="padding-top:6rem;padding-bottom:5rem">
+    <!-- Page title -->
+    <div class="page-title-wrap">
+      <h1 class="page-title" id="shop-heading">{t.shop.title}</h1>
     </div>
-    <div class="container">
-      <h1>{t.shop.title}</h1>
-      <p>
-        {usingMedusa
-          ? `${shopProducts.length} products from our Medusa store`
-          : `${shopProducts.length} items in our collection`}
-      </p>
-    </div>
-  </section>
 
-  <div class="container" style="padding-top:2.5rem;padding-bottom:5rem">
     <!-- Shop header -->
     <div class="shop-header">
       <div>
-        <h1 id="shop-heading">{t.shop.title}</h1>
         <p class="results" id="results-count">{shopProducts.length} results</p>
       </div>
       <div class="shop-toolbar">
@@ -92,17 +80,15 @@ const categories = usingMedusa
       <aside class="shop-sidebar" id="shop-sidebar" aria-label={t.shop.filters}>
         <button type="button" class="clear-filters" id="clear-filters">{t.shop.clear_filters}</button>
 
-        {!usingMedusa && (
-          <div class="filter-section">
-            <h4>Category</h4>
-            {categories.map((cat) => (
-              <label>
-                <input type="checkbox" class="cat-filter" value={cat} />
-                {cat.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-              </label>
-            ))}
-          </div>
-        )}
+        <div class="filter-section">
+          <h4>Category</h4>
+          {categories.map((cat) => (
+            <label>
+              <input type="checkbox" class="cat-filter" value={cat} />
+              {cat.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+            </label>
+          ))}
+        </div>
 
         <div class="filter-section">
           <h4>Badge</h4>
@@ -144,8 +130,12 @@ const categories = usingMedusa
               name={p.name}
               price={p.price}
               image={p.image}
+              category={p.category}
               badge={p.badge as any}
               grade={p.grade}
+              condition={p.condition}
+              rarity={p.rarity}
+              sku={p.sku}
               stock={p.stock}
               locale={locale}
             />

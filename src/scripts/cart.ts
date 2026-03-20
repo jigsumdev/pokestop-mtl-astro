@@ -70,6 +70,12 @@ export function initProductCards(): void {
     const price = parseFloat(card.dataset.productPrice || "0");
     const image = card.dataset.productImage!;
     const stock = parseInt(card.dataset.productStock || "1");
+    const category = card.dataset.category;
+    const badge = card.dataset.badge;
+    const grade = card.dataset.grade;
+    const condition = card.dataset.condition;
+    const rarity = card.dataset.rarity;
+    const sku = card.dataset.sku;
 
     // Add to cart button
     const addBtn = card.querySelector<HTMLButtonElement>(".add-cart");
@@ -92,13 +98,13 @@ export function initProductCards(): void {
     // Open popup on card click
     card.addEventListener("click", (e) => {
       if ((e.target as HTMLElement).closest(".add-cart")) return;
-      openProductPopup({ id, name, price, image, stock });
+      openProductPopup({ id, name, price, image, stock, category, badge, grade, condition, rarity, sku });
     });
 
     card.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        openProductPopup({ id, name, price, image, stock });
+        openProductPopup({ id, name, price, image, stock, category, badge, grade, condition, rarity, sku });
       }
     });
   });
@@ -110,6 +116,12 @@ interface PopupProduct {
   price: number;
   image: string;
   stock: number;
+  category?: string;
+  badge?: string;
+  grade?: string;
+  condition?: string;
+  rarity?: string;
+  sku?: string;
 }
 
 let currentPopupProduct: PopupProduct | null = null;
@@ -121,18 +133,71 @@ export function openProductPopup(product: PopupProduct): void {
   const titleEl = document.getElementById("product-popup-title");
   const priceEl = document.getElementById("product-popup-price");
   const statusEl = document.getElementById("product-popup-status");
+  const subtitleEl = document.getElementById("product-popup-subtitle");
+  const badgeChipEl = document.getElementById("product-popup-badge-chip");
+  const categoryEl = document.getElementById("product-popup-category");
+  const gradeEl = document.getElementById("product-popup-grade");
+  const conditionEl = document.getElementById("product-popup-condition");
+  const rarityEl = document.getElementById("product-popup-rarity");
+  const skuEl = document.getElementById("product-popup-sku");
+  const stockEl = document.getElementById("product-popup-stock");
+  const categoryRowEl = document.getElementById("product-popup-row-category");
+  const gradeRowEl = document.getElementById("product-popup-row-grade");
+  const conditionRowEl = document.getElementById("product-popup-row-condition");
+  const rarityRowEl = document.getElementById("product-popup-row-rarity");
+  const skuRowEl = document.getElementById("product-popup-row-sku");
+  const stockRowEl = document.getElementById("product-popup-row-stock");
   const buyBtn = document.getElementById("product-popup-buy") as HTMLButtonElement;
-  if (!overlay || !imgEl || !titleEl || !priceEl || !statusEl || !buyBtn) return;
+  if (!overlay || !imgEl || !titleEl || !priceEl || !statusEl || !subtitleEl || !badgeChipEl || !categoryEl || !gradeEl || !conditionEl || !rarityEl || !skuEl || !stockEl || !categoryRowEl || !gradeRowEl || !conditionRowEl || !rarityRowEl || !skuRowEl || !stockRowEl || !buyBtn) return;
 
   const lang = document.documentElement.lang;
+  const contactLabel = lang === "fr" ? "Contactez-nous" : "Contact";
+  const availableLabel = lang === "fr" ? "Disponible" : "Available";
+  const unavailableLabel = lang === "fr" ? "Indisponible" : "Unavailable";
+  const categoryLabel = lang === "fr" ? "Categorie" : "Category";
+  const stockUnit = lang === "fr" ? "en stock" : "in stock";
+  const stockOut = lang === "fr" ? "Rupture de stock" : "Out of stock";
+  const formatValue = (value?: string) => value && value.trim().length > 0 ? value.replace(/_/g, " ") : "";
+  const capitalizeWords = (text: string) => text.replace(/\b\w/g, (ch) => ch.toUpperCase());
+  const setRowValue = (row: HTMLElement, valueEl: HTMLElement, value: string) => {
+    if (!value) {
+      row.style.display = "none";
+      valueEl.textContent = "";
+      return;
+    }
+    row.style.display = "";
+    valueEl.textContent = value;
+  };
+
   imgEl.src = product.image;
   imgEl.alt = product.name;
   titleEl.textContent = product.name;
-  priceEl.textContent = product.price === 0 ? "Contact" : `$${product.price.toFixed(2)}`;
+  const categoryValue = product.category ? capitalizeWords(product.category.replace(/-/g, " ")) : "";
+  subtitleEl.textContent = categoryValue ? `${categoryLabel}: ${categoryValue}` : "";
+  subtitleEl.style.display = categoryValue ? "" : "none";
+
+  const badgeValue = product.badge ? product.badge.toLowerCase() : "";
+  if (badgeValue && ["new", "hot", "rare", "sale"].includes(badgeValue)) {
+    badgeChipEl.textContent = capitalizeWords(badgeValue);
+    badgeChipEl.className = `popup-badge badge ${badgeValue}`;
+    badgeChipEl.style.display = "";
+  } else {
+    badgeChipEl.textContent = "";
+    badgeChipEl.className = "popup-badge badge";
+    badgeChipEl.style.display = "none";
+  }
+
+  priceEl.textContent = product.price === 0 ? contactLabel : `$${product.price.toFixed(2)}`;
   statusEl.textContent = product.stock === 0
-    ? (lang === "fr" ? "Vendu" : "Sold")
-    : (lang === "fr" ? "Disponible" : "Available");
+    ? unavailableLabel
+    : availableLabel;
   statusEl.className = `popup-status ${product.stock === 0 ? "sold" : "available"}`;
+  setRowValue(categoryRowEl, categoryEl, categoryValue);
+  setRowValue(gradeRowEl, gradeEl, formatValue(product.grade));
+  setRowValue(conditionRowEl, conditionEl, formatValue(product.condition ? capitalizeWords(product.condition) : undefined));
+  setRowValue(rarityRowEl, rarityEl, formatValue(product.rarity ? capitalizeWords(product.rarity) : undefined));
+  setRowValue(skuRowEl, skuEl, formatValue(product.sku));
+  setRowValue(stockRowEl, stockEl, product.stock > 0 ? `${product.stock} ${stockUnit}` : stockOut);
   buyBtn.textContent = product.stock === 0
     ? (lang === "fr" ? "Indisponible" : "Unavailable")
     : (lang === "fr" ? "Ajouter au panier" : "Add to Cart");
